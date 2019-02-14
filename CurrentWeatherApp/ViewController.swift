@@ -131,6 +131,7 @@ class ViewController: UIViewController {
         
     }
     
+    // Function that determines state of temperature unit control and displays the temperature accordingly
     func setTemp() {
         if fahrenheitIsSelected == true {
             temperatureLabel.text = "\(forecast!.currently!.temperature!)"
@@ -197,6 +198,7 @@ class ViewController: UIViewController {
             
         }
         
+        // Call the setColors fn to set the theme and then append the skyconview
         setColors(foreground: textColor!, background: backgroundColor!)
         iconImageView.addSubview(skyconImageView)
         
@@ -213,7 +215,7 @@ class ViewController: UIViewController {
         return formatter.string(from: date)
     }
     
-    // Function to change colors of all labels in scene
+    // Function that sets the foreground and background colors or the scene
     func setColors(foreground: UIColor, background: UIColor) {
         
         // Set the label colors in the header stack views
@@ -237,11 +239,16 @@ class ViewController: UIViewController {
         backgroundImageView.backgroundColor = background
     }
     
+    // MARK:- IBAction Methods
+    
     @IBAction func fahrenheitTapped(_ sender: UIButton) {
+        
+        // When fahrenheit is tapped, check if it is already selected, if so, do nothing. If not, then fade out the fahrenheit control and fade in the celsius button, making clear which control is selected and vice versa
         
         if fahrenheitIsSelected == true {
             return
         } else if fahrenheitIsSelected == false {
+            // Make fahrenheit selected and celsisus unselected, reload temp label and collectionview cells
             fahrenheit.alpha = 1
             celsius.alpha = 0.3
             fahrenheitIsSelected = true
@@ -251,6 +258,7 @@ class ViewController: UIViewController {
         
     }
     
+    // Like the above function but in reverse
     @IBAction func celsiusTapped(_ sender: UIButton) {
         
         if fahrenheitIsSelected == true {
@@ -267,15 +275,27 @@ class ViewController: UIViewController {
     
 }
 
+// Delegate methods for the WeatherModelProtocol
 extension ViewController: WeatherModelProtocol {
     
+    // This method fires once a forecast has been successfully retrieved from DarkSky
     func forecastRetrieved(_ forecast: Weather) {
+        // Store the retrieved forecast as a property
         self.forecast = forecast
+        // Display the data from the forecast object
         setCurrentForecastUI()
+        
+        // Once data has arrived, it is now appropriatte to set the controller as the collectionview data source and delegate
         collectionView.dataSource = self
         collectionView.delegate = self
+        
+        // If the collectionview is displaying old data, a reload will clear and replace it with the new data
         collectionView.reloadData()
+        
+        // Make the collection view visible after hiding the transition process from forecasts
         collectionView.alpha = 1
+        
+        // Mask the more complicated state effects and animations by merging the colors for states with the colors of the overall theme
         fahrenheit.setTitleColor(textColor, for: .normal)
         fahrenheit.setTitleColor(textColor, for: .selected)
         celsius.setTitleColor(textColor, for: .normal)
@@ -299,6 +319,8 @@ extension ViewController: CLLocationManagerDelegate {
         if let location = locations.first {
             print("location: \(location)")
             locationString = "Your current location"
+            
+            
             model.getWeather(locationManager.location!.coordinate.latitude, locationManager.location!.coordinate.longitude)
             
         }

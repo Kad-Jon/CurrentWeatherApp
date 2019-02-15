@@ -198,7 +198,7 @@ class ViewController: UIViewController {
             
         }
         
-        // Call the setColors fn to set the theme and then append the skyconview
+        // Call the setColors method to set the theme and then append the skyconview
         setColors(foreground: textColor!, background: backgroundColor!)
         iconImageView.addSubview(skyconImageView)
         
@@ -314,13 +314,15 @@ extension ViewController: CLLocationManagerDelegate {
         }
     }
     
-    // Method that gets called when the location request comes back, returning an array of locations
+    // Method that gets called when the location request comes back, returning an array of locations, of which the first is the users location
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
             print("location: \(location)")
+            
+            // Set the location title label
             locationString = "Your current location"
             
-            
+            // Fire off WeatherModels getWeather method passing the users location co-ordinate properties as the arguments, thus requesting the forecast at their location
             model.getWeather(locationManager.location!.coordinate.latitude, locationManager.location!.coordinate.longitude)
             
         }
@@ -337,29 +339,52 @@ extension ViewController: UICollectionViewDelegate {
     
 }
 
+/* Collection view data source protocols. The collection view is used to display a horizontal scrollable list of weather icon and temperature for the upcoming 24 hours.
+This data is provided by the array of HourData objects present in a forecast object inside of its Hourly property */
+
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        // Keep it simple with a 24 hour forecast. Any less is lacking and any more is awkward and potentially clunkly.
         return 24
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        // Instantiate custom and reusable cell
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HourDataCell", for: indexPath) as? HourCollectionViewCell
+        
+        // Load the custom cell with data needed to populate its views, using the index path to access the respective HourData Objects
         cell!.timeZoneIdentifier = forecast!.timezone!
         cell!.data = forecast!.hourly!.data![indexPath.row]
+        
+        // Lets the cell know to display the temperature in the users desired units
         cell!.fahrenheitIsSelected = self.fahrenheitIsSelected
         cell?.setUI()
+        
+        // Set color in accordance to theme
         cell?.setColor(color: textColor!)
+        
         return cell!
     }
     
     
 }
 
+// Delegate methods for the LocationSearchTable.
+
 extension ViewController: LocationSearchDelegate {
     
-    func remoteLocationRetrieved(location: MKMapItem) {
+    // Delegate method that takes in a MapItem (objects returned from a location search) as an argument
+    func locationSelected(location: MKMapItem) {
+        
+        // Set location title label to the MapItems name
         locationString = location.name
+        
+        // Use location co-ordinates to get a weather forecast for the new location
         model.getWeather(location.placemark.location?.coordinate.latitude, location.placemark.location?.coordinate.longitude)
+        
+        // Hide the collection view while the new data loads
         collectionView.alpha = 0
         
     }

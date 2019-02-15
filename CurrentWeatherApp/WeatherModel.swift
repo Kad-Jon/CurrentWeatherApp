@@ -6,40 +6,29 @@
 //  Copyright © 2019 Kjonza. All rights reserved.
 //
 
-/*
- 
- Things to do:
- - Build basic interface to load up any given forecast request weather details
- - Find out how to integrate skycons project file to starts using SKYIcon view objects
- - Integrate a search bar which returns a list of locations using the native Apple MapKit API
- 
-In short what I want from the interface is detailed current weather conditions with summary, icon and temperature as the main data parts and perhaps a load of other peripheral ones 
- 
- */
-
 import Foundation
 
+// Declare the weather model protcol and required delegate method
 protocol WeatherModelProtocol {
+    
+    // method for delegate to handle a retrieved weather forecast
     func forecastRetrieved(_ forecast:Weather)
 }
 
 class WeatherModel {
     
+    // Delegate property
     var delegate:WeatherModelProtocol?
+    
+    // This function constructs an API call using the passed co-ordinates, and retrieves a forecast object. Once retrieved the delegate method is called to allow the delegate to handle the retrieved forecast object
     
     func getWeather(_ latitude: Double!,_ longtitude: Double!) {
         
-        if latitude == nil && longtitude == nil {
-            return
-        }
-        
-        print("\(latitude!),\(longtitude!)")
-        
-        // Construct a string url
+        // Construct a string url using passed co-ordinates, in accordance with DarkSky's documentation. The exclude excludes all undesired data from the call
         
         let stringUrl = "https://api.darksky.net/forecast/29e8abf4c1f09ca0908010d851868321/\(latitude!),\(longtitude!)?exclude=minutely,daily,alerts,flags"
         
-        // Create a url object and check that it is not nil
+        // Initialize a url object using stringUrl and check that it is not nil
         
         let url = URL(string: stringUrl)
         
@@ -70,7 +59,7 @@ class WeatherModel {
                     // Attempt to decode the data into a weather struct and assign it to result
                     let result = try decoder.decode(Weather.self, from: data!)
                     
-                    // Return to the main thread using dispatch queue
+                    // Return to the main thread using dispatch queue and call forecatsRetrieved method
                     DispatchQueue.main.async {
                         self.delegate?.forecastRetrieved(result)
                     }

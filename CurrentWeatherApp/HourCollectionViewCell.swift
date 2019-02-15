@@ -10,17 +10,21 @@ import UIKit
 
 class HourCollectionViewCell: UICollectionViewCell {
     
+    // Reference to views in prototype cell
     
     @IBOutlet weak var timeLabel: UILabel!
     @IBOutlet weak var iconImageView: UIImageView!
     @IBOutlet weak var tempLabel: UILabel!
     
-    
+    // Instantiate and position SKYIconView
     let skyconImageView = SKYIconView(frame: CGRect(x: -15, y: -15, width: 40, height: 48))
+    
+    // Property to hold HourData object, timezone and temperature unit selection status
     var data:HourData?
     var timeZoneIdentifier: String?
     var fahrenheitIsSelected = true
     
+    // Method to set label texts
     func setUI() {
         
         iconImageView.addSubview(skyconImageView)
@@ -29,6 +33,7 @@ class HourCollectionViewCell: UICollectionViewCell {
         setIcon()
     }
     
+    // Method to set temperature in either celsius or fahrenheit, depending on status
     func setTemp() {
         if fahrenheitIsSelected == true {
             tempLabel.text = "\(data!.temperature!)"
@@ -39,6 +44,7 @@ class HourCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    // Function takes in unix time from API and converts it into hh time
     func getLocalTime(unixTime: Double, timezone: String) -> String {
         let date = Date(timeIntervalSince1970: unixTime)
         let formatter = DateFormatter()
@@ -48,6 +54,7 @@ class HourCollectionViewCell: UICollectionViewCell {
         return formatter.string(from: date)
     }
     
+    // method sets skycon stype depending on forecast icon property
     func setIcon() {
         
         
@@ -80,6 +87,7 @@ class HourCollectionViewCell: UICollectionViewCell {
         
     }
     
+    // method to set colors of foreground (the bakground is clear colored)
     func setColor(color: UIColor) {
         tempLabel.textColor = color
         timeLabel.textColor = color

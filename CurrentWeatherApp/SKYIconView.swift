@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 
+// Miwands Skycons
+
 enum Skycons
 {
     case clearDay,clearNight,rain,sleet,wind,fog,cloudy,partlyCloudyDay,partlyCloudyNight,snow
